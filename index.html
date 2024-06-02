@@ -1,0 +1,89 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trending Topics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .trends {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="scrapeButton">Click here to run the script</button>
+    <div id="results" class="hidden">
+        <h2>These are the most happening topics as on <span id="dateTime"></span></h2>
+        <ul id="trendsList"></ul>
+        <p>The IP address used for this query was <span id="ipAddress"></span>.</p>
+        <h3>Here’s a JSON extract of this record from the MongoDB:</h3>
+        <pre id="jsonExtract"></pre>
+        <button id="refreshButton">Click here to run the query again</button>
+    </div>
+
+    <script>
+
+        document.getElementById('scrapeButton').addEventListener('click', scrapeData);
+
+        document.getElementById('refreshButton').addEventListener('click', scrapeData);
+
+        async function scrapeData() {
+            try {
+                const scrapeResponse = await fetch('http://localhost:3000/scrap-trends');
+                const scrapeResult = await scrapeResponse.json();
+                if (scrapeResult.message === 'Success') {
+                    fetchTrends();
+                } else {
+                    alert('Error scraping trends: ' + scrapeResult.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+
+        async function fetchTrends() {
+            try {
+                const response = await fetch('http://localhost:3000/get-db-trends');
+                const trends = await response.json();
+
+                if (trends.length > 0) {
+                    const trend = trends[0];
+                    document.getElementById('dateTime').innerText = new Date(trend.dateTime).toLocaleString();
+                    document.getElementById('ipAddress').innerText = trend.ip;
+
+                    const trendsList = document.getElementById('trendsList');
+                    trendsList.innerHTML = '';
+                    trend.trends.forEach((t, index) => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Name of trend${index + 1}: ${t}`;
+                        trendsList.appendChild(listItem);
+                    });
+
+                    document.getElementById('jsonExtract').textContent = JSON.stringify(trend, null, 2);
+
+                    document.getElementById('results').classList.remove('hidden');
+                } else {
+                    alert('No trends found.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+    </script>
+</body>
+
+</html>

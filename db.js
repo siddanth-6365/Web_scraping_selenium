@@ -2,7 +2,12 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 require("dotenv").config();
 
-mongoose.connect(process.env.mongodb_uri);
+const connectionOptions = {
+  ssl: true,
+  tlsAllowInvalidCertificates: false,
+};
+
+mongoose.connect(process.env.mongodb_uri)
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));

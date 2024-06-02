@@ -1,4 +1,4 @@
-const { Builder, By, until } = require("selenium-webdriver");
+const { Builder, By, until, Browser } = require("selenium-webdriver");
 const axios = require("axios");
 const { v4: uuidv4 } = require("uuid");
 const chrome = require("selenium-webdriver/chrome");
@@ -11,33 +11,60 @@ async function getTrendingTopics() {
   const options = new chrome.Options();
   options.addArguments(`--proxy-server=${proxy}`);
 
-  const driver = new Builder()
-    .forBrowser("chrome")
-    .setChromeOptions(options)
-    .build();
+  const driver = new Builder().forBrowser(Browser.CHROME).build();
+  // .setChromeOptions(options)
 
   try {
-    await driver.get("https://x.com/home");
+    await driver.get("https://x.com/i/flow/login");
+    // Twitter Login
+    const usernameInput = await driver.wait(
+      until.elementLocated(By.css('input[name="text"]')),
+      20000
+    );
+    await usernameInput.sendKeys(env.TWITTER_USERNAME);
 
-    // Wait for the trending section to be located
-    const trendingSection = await driver.wait(
+    const nextButton = await driver.findElement(
+      By.xpath("//span[text()='Next']/ancestor::button")
+    );
+    await nextButton.click();
+
+    const passwordInput = await driver.wait(
+      until.elementLocated(By.css('input[name="password"]')),
+      20000
+    );
+    await passwordInput.sendKeys(env.TWITTER_PASSWORD);
+
+    const loginButton = await driver.wait(
       until.elementLocated(
-        By.css('section[aria-labelledby="accessible-list-0"]')
+        By.css('button[data-testid="LoginForm_Login_Button"]')
       ),
-      10000
+      20000
     );
+    await loginButton.click();
 
-    console.log("trendingSection located");
+    // Wait for the home page to load
+    // await driver.wait(until.urlContains("https://x.com/home"), 10000);
+    await driver.sleep(5000);
 
-    // Find all the trending items within the trending section
-    const trends = await trendingSection.findElements(
-      By.css('div[data-testid="trend"]')
+    // Find all the trending topic divs
+    const trendingTopicDivs = await driver.findElements(
+      By.css(
+        "div.css-146c3p1.r-bcqeeo.r-1ttztb7.r-qvutc0.r-37j5jr.r-a023e6.r-rjixqe.r-b88u0q.r-1bymd8e"
+      )
     );
+    const trends = trendingTopicDivs.slice(0, 5);
 
+    // Extract the text from the span elements within each div
     let trendingTopics = [];
-    for (let i = 0; i < 5; i++) {
-      trendingTopics.push(await trends[i].getText());
+    for (const trendDiv of trends) {
+      const spanElement = await trendDiv.findElement(
+        By.css("span.css-1jxf684.r-bcqeeo.r-1ttztb7.r-qvutc0.r-poiln3")
+      );
+      const topicText = await spanElement.getText();
+      trendingTopics.push(topicText);
     }
+
+    console.log("Trending Topics:", trendingTopics);
 
     const ipResponse = await axios.get("https://api.ipify.org?format=json", {
       proxy: false,
@@ -48,7 +75,7 @@ async function getTrendingTopics() {
       id: uuidv4(),
       trends: trendingTopics,
       dateTime: new Date(),
-      ip: ip,
+      ip,
     });
 
     await record.save();
