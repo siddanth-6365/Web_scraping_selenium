@@ -1,12 +1,12 @@
-FROM node:14
+FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
 RUN npm install
 
-COPY..
+COPY . .
 
 EXPOSE 80
 

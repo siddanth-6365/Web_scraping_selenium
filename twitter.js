@@ -66,7 +66,9 @@ async function getTrendingTopics() {
         "div.css-146c3p1.r-bcqeeo.r-1ttztb7.r-qvutc0.r-37j5jr.r-a023e6.r-rjixqe.r-b88u0q.r-1bymd8e"
       )
     );
+    console.log("trendin Tpics :",trendingTopicDivs);
     const trends = trendingTopicDivs.slice(0, 5);
+
 
     // Extract the text from the span elements within each div
     let trendingTopics = [];
