@@ -14,21 +14,27 @@ const env = process.env;
 const chromeCapabilities = Capabilities.chrome();
 
 async function getTrendingTopics() {
-  const proxyServer = `http://${env.PROXYMESH_USERNAME}:${env.PROXYMESH_PASSWORD}@uk.proxymesh.com:31280`;
+  // const proxyServer = `http://${env.PROXYMESH_USERNAME}:${env.PROXYMESH_PASSWORD}@uk.proxymesh.com:31280`;
+
+  // chromeCapabilities.set("goog:chromeOptions", {
+  //   args: [ `--proxy-server=${proxyServer}`],
+  // });
 
   chromeCapabilities.set("goog:chromeOptions", {
-    args: [ `--proxy-server=${proxyServer}`], 
+    args: ["--headless", "--disable-gpu"],
   });
 
   const driver = new Builder()
     .forBrowser(Browser.CHROME)
-    // .withCapabilities(chromeCapabilities)
+    .setChromeOptions(chromeCapabilities)
     .build();
+
+  // .withCapabilities(chromeCapabilities)
 
   // .setChromeOptions(options)
 
   try {
-    console.log("starting")
+    console.log("starting");
     await driver.get("https://x.com/i/flow/login");
     // Twitter Login
     const usernameInput = await driver.wait(
