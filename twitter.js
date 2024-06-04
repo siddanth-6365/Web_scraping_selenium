@@ -14,21 +14,21 @@ const env = process.env;
 const chromeCapabilities = Capabilities.chrome();
 
 async function getTrendingTopics() {
-  const proxy = `http://${env.proxy_username}:${env.proxy_password}@${env.proxy_host}:${env.proxy_port}`;
-  const options = new chrome.Options();
-  options.addArguments(`--proxy-server=${proxy}`);
+  const proxyServer = `http://${env.PROXYMESH_USERNAME}:${env.PROXYMESH_PASSWORD}@uk.proxymesh.com:31280`;
 
   chromeCapabilities.set("goog:chromeOptions", {
-    args: ["--headless", "--disable-gpu"],
+    args: [ `--proxy-server=${proxyServer}`], 
   });
 
   const driver = new Builder()
     .forBrowser(Browser.CHROME)
-    .setChromeOptions(chromeCapabilities)
+    // .withCapabilities(chromeCapabilities)
     .build();
+
   // .setChromeOptions(options)
 
   try {
+    console.log("starting")
     await driver.get("https://x.com/i/flow/login");
     // Twitter Login
     const usernameInput = await driver.wait(
