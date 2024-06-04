@@ -35,17 +35,20 @@ async function getTrendingTopics() {
       until.elementLocated(By.css('input[name="text"]')),
       20000
     );
+    console.log("usernameInput :", usernameInput);
     await usernameInput.sendKeys(env.TWITTER_USERNAME);
 
     const nextButton = await driver.findElement(
       By.xpath("//span[text()='Next']/ancestor::button")
     );
+    console.log("nextButton :", nextButton);
     await nextButton.click();
 
     const passwordInput = await driver.wait(
       until.elementLocated(By.css('input[name="password"]')),
       20000
     );
+    console.log("password :", passwordInput);
     await passwordInput.sendKeys(env.TWITTER_PASSWORD);
 
     const loginButton = await driver.wait(
@@ -54,11 +57,12 @@ async function getTrendingTopics() {
       ),
       20000
     );
+    console.log("loginButton :", loginButton);
     await loginButton.click();
 
     // Wait for the home page to load
     // await driver.wait(until.urlContains("https://x.com/home"), 10000);
-    await driver.sleep(5000);
+    await driver.sleep(3000);
 
     // Find all the trending topic divs
     const trendingTopicDivs = await driver.findElements(
@@ -66,9 +70,8 @@ async function getTrendingTopics() {
         "div.css-146c3p1.r-bcqeeo.r-1ttztb7.r-qvutc0.r-37j5jr.r-a023e6.r-rjixqe.r-b88u0q.r-1bymd8e"
       )
     );
-    console.log("trendin Tpics :",trendingTopicDivs);
+    console.log("trendingTopicDivs :", trendingTopicDivs);
     const trends = trendingTopicDivs.slice(0, 5);
-
 
     // Extract the text from the span elements within each div
     let trendingTopics = [];
@@ -81,7 +84,6 @@ async function getTrendingTopics() {
     }
 
     console.log("Trending Topics:", trendingTopics);
-
     const ipResponse = await axios.get("https://api.ipify.org?format=json", {
       proxy: false,
     });
