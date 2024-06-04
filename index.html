@@ -41,9 +41,7 @@
 
         async function scrapeData() {
             try {
-                const scrapeResponse = await fetch('https://web-scraping-selenium.onrender.com/scrap-trends', {
-                    mode: 'no-cors'
-                });
+                const scrapeResponse = await fetch('https://web-scraping-selenium.onrender.com/scrap-trends');
                 const scrapeResult = await scrapeResponse.json();
                 if (scrapeResult.message === 'Success') {
                     fetchTrends();

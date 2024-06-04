@@ -19,7 +19,7 @@ async function getTrendingTopics() {
   options.addArguments(`--proxy-server=${proxy}`);
 
   chromeCapabilities.set("goog:chromeOptions", {
-    args: ["--headless", "--disable-gpu", "--no-sandbox"],
+    args: ["--headless", "--disable-gpu"],
   });
 
   const driver = new Builder()
