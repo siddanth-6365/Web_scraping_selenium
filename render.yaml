@@ -1,0 +1,5 @@
+services:
+  - type: web
+    name: my-selenium-app
+    env: docker
+    dockerfilePath: ./path/to/Dockerfile

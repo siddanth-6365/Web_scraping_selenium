@@ -1,17 +1,31 @@
-const { Builder, By, until, Browser } = require("selenium-webdriver");
+const {
+  Builder,
+  By,
+  until,
+  Browser,
+  Capabilities,
+} = require("selenium-webdriver");
 const axios = require("axios");
 const { v4: uuidv4 } = require("uuid");
 const chrome = require("selenium-webdriver/chrome");
 const Trend = require("./db");
 require("dotenv").config();
 const env = process.env;
+const chromeCapabilities = Capabilities.chrome();
 
 async function getTrendingTopics() {
   const proxy = `http://${env.proxy_username}:${env.proxy_password}@${env.proxy_host}:${env.proxy_port}`;
   const options = new chrome.Options();
   options.addArguments(`--proxy-server=${proxy}`);
 
-  const driver = new Builder().forBrowser(Browser.CHROME).build();
+  chromeCapabilities.set("goog:chromeOptions", {
+    args: ["--headless", "--disable-gpu", "--no-sandbox"],
+  });
+
+  const driver = new Builder()
+    .forBrowser(Browser.CHROME)
+    .setChromeOptions(chromeCapabilities)
+    .build();
   // .setChromeOptions(options)
 
   try {
